@@ -1,7 +1,7 @@
 {
-  "name": "collections",
+  "name": "binary-search-trees",
   "version": "1.0.0",
-  "description": "code demonstrating various collections for Ada's Advanced Data Strucutres course",
+  "description": "code demonstrating various binary-search-trees for Ada's Advanced Data Strucutres course",
   "main": "index.js",
   "scripts": {
     "test": "jest --watch",

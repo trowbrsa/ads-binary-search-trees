@@ -8,6 +8,7 @@ class BSTNode {
   }
 }
 
+
 class BinarySearchTree {
   constructor(Node = BSTNode) {
     this.Node = Node;
@@ -19,10 +20,11 @@ class BinarySearchTree {
     // Retuns {node, parent}, either of which may be undefined
     // Node undefined means the key isn't in the tree
     // Parent undefined means node is the root
-    let parent = undefined;
     let node = this._root;
+    let parent = node?.parent;
 
-    while (node) {
+    // Nodes without keys are considered sentinels
+    while (node?.key) {
       if (key < node.key) {
         parent = node;
         node = node.left;
@@ -36,12 +38,12 @@ class BinarySearchTree {
     return { node, parent }
   }
 
-  insert(key, value = true) {
+  _insertInternal(key, value = true) {
     const results = this._findNode(key);
     let { node } = results;
     const { parent } = results;
-    
-    if (node) {
+
+    if (node?.key) {
       // key already in the tree, replace the value
       node.value = value;
 
@@ -50,17 +52,23 @@ class BinarySearchTree {
       node = new this.Node({ key, value, parent });
       this._count += 1;
 
-      if (parent) {
+      if (parent?.key) {
         if (key < parent.key) {
           parent.left = node;
         } else {
           parent.right = node;
         }
-        
+
       } else {
         this._root = node;
       }
     }
+    return node;
+  }
+
+  insert(key, value) {
+    // same as insertInternal, but doesn't return the node to preserve encapsulation
+    this._insertInternal(key, value);
   }
 
   lookup(key) {
@@ -70,7 +78,7 @@ class BinarySearchTree {
   }
 
   delete(key) {
-
+    // TODO
   }
 
   count() {
@@ -78,7 +86,7 @@ class BinarySearchTree {
   }
 
   _visit(node, callback, i = 0) {
-    if (node) {
+    if (node?.key) {
       i = this._visit(node.left, callback, i);
       callback({ key: node.key, value: node.value }, i, this);
       i = this._visit(node.right, callback, i + 1);

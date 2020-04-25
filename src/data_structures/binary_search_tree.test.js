@@ -6,7 +6,7 @@ import RedBlackTree from './red_black_tree';
 
 const dataStructures = [
   BinarySearchTree,
-  // RedBlackTree,
+  RedBlackTree,
 ];
 
 dataStructures.forEach(TargetDS => {

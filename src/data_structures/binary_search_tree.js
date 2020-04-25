@@ -37,24 +37,28 @@ class BinarySearchTree {
   }
 
   insert(key, value = true) {
-    const { node, parent } = this._findNode(key);
+    const results = this._findNode(key);
+    let { node } = results;
+    const { parent } = results;
+    
     if (node) {
-      // replace
+      // key already in the tree, replace the value
       node.value = value;
 
     } else {
       // new node
-      const newNode = new this.Node({ key, value, parent });
+      node = new this.Node({ key, value, parent });
       this._count += 1;
 
       if (parent) {
         if (key < parent.key) {
-          parent.left = newNode;
+          parent.left = node;
         } else {
-          parent.right = newNode;
+          parent.right = node;
         }
+        
       } else {
-        this._root = newNode;
+        this._root = node;
       }
     }
   }
@@ -73,8 +77,17 @@ class BinarySearchTree {
     return this._count;
   }
 
-  forEach(callback) {
+  _visit(node, callback, i = 0) {
+    if (node) {
+      i = this._visit(node.left, callback, i);
+      callback({ key: node.key, value: node.value }, i, this);
+      i = this._visit(node.right, callback, i + 1);
+    }
+    return i;
+  }
 
+  forEach(callback) {
+    this._visit(this._root, callback)
   }
 }
 

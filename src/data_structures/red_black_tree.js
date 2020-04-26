@@ -100,10 +100,70 @@ class RedBlackTree extends BinarySearchTree {
   }
 
   _insertFixup(node) {
-    // while (node.parent.color === RBTNode.RED) {
+    /**
+     * The point of this look is to fix the problem of 2 red
+     * nodes in a row: node, and its parent
+     * - Node is the node we just added, so we know it's red
+     * - If parent isn't red, we don't have a problem so we bail
+     * That node and its parent are both red is an INVARIANT
+     * 
+     * This means:
+     * - Neither node nor parent is the root (root is always black)
+     * - The grandparent must be black (can't have 2 red nodes in a row
+     *    and we know the tree was fine before we started)
+     */
+    while (node.color === RBTNode.RED && node.parent.color === RBTNode.RED) {
+      const grandparent = node.parent.parent;
+      if (node.parent === grandparent.left) {
+        const uncle = grandparent.right;
+        if (uncle.color === RBTNode.RED) {
+          // CASE 1
+          // Flip generation colors between parent and grandparent
+          // This either solves the problem, if great-grandparent is black,
+          // or moves the problem closer to the root where we know we can create space
+          node.parent.color = RBTNode.BLACK;
+          uncle.color = RBTNode.BLACK;
+          grandparent.color = RBTNode.RED;
+          node = grandparent;
 
-    // }
-    node.color = RBTNode.BLACK;
+        } else {
+          if (node === node.parent.right) {
+            // CASE 2
+            // Force a "left-leaning" alignment of red nodes
+            node = node.parent;
+            this._rotateLeft(node);
+          }
+          // CASE 3
+          // Create some "wiggle room" for a red node
+          // parent.color is no longer red, so we'll exit the loop
+          node.parent.color = RBTNode.BLACK;
+          grandparent.color = RBTNode.RED;
+          this._rotateRight(grandparent);
+        }
+      } else { // parent is the right child
+        // Symetric to the above left child code
+        const uncle = grandparent.left;
+        if (uncle.color === RBTNode.RED) {
+          // CASE 1
+          node.parent.color = RBTNode.BLACK;
+          uncle.color = RBTNode.BLACK;
+          grandparent.color = RBTNode.RED;
+          node = grandparent;
+
+        } else {
+          if (node === node.parent.left) {
+            // CASE 2
+            node = node.parent;
+            this._rotateRight(node);
+          }
+          // CASE 3
+          node.parent.color = RBTNode.BLACK;
+          grandparent.color = RBTNode.RED;
+          this._rotateLeft(grandparent);
+        }
+      }
+    }
+    this._root.color = RBTNode.BLACK;
   }
 
   insert(key, value) {

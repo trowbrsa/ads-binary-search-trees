@@ -26,6 +26,16 @@ class RedBlackTree extends BinarySearchTree {
     super(RBTNode);
   }
 
+  /**
+   * The two rotation functions are symetric, and could presumably
+   * be collapsed into one that takes a direction 'left' or 'right',
+   * calculates the opposite, and uses [] instead of . to access.
+   * 
+   * Felt too confusing to be worth it. Plus I bet* the JIT optimizes two
+   * functions with static lookups better than one with dynamic lookups.
+   * 
+   * (*without any evidence whatsoever)
+   */
   _rotateLeft(node) {
     const child = node.right;
 
@@ -60,7 +70,33 @@ class RedBlackTree extends BinarySearchTree {
   }
 
   _rotateRight(node) {
+    const child = node.left;
 
+    if (node === RBTNode.sentinel) {
+      throw new Error('Cannot rotate a sentinel node');
+    } else if (child === RBTNode.sentinel) {
+      throw new Error('Cannot rotate away from a sentinal node');
+    }
+
+    // turn child's right subtree into node's left subtree
+    node.left = child.right;
+    if (child.right.key) {
+      child.right.parent = node;
+    }
+
+    // link node's parent to child
+    child.parent = node.parent;
+    if (!node.parent.key) {
+      this._root = child;
+    } else if (node === node.parent.right) {
+      node.parent.right = child;
+    } else {
+      node.parent.left = child;
+    }
+
+    // put node on child's right
+    child.right = node;
+    node.parent = child;
   }
 
   _insertFixup(node) {

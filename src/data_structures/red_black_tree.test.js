@@ -117,7 +117,7 @@ describe(RedBlackTree, () => {
     /**
      * Dear Reader,
      * 
-     * The following is some of the jankiest, monkey-patchey code
+     * The following is some of the jankiest, monkey-patchey-est code
      * I've ever had the displeasure of writing. While I believe that
      * the ends justify the means, I am in no way proud of what I've
      * done here today.
@@ -137,6 +137,21 @@ describe(RedBlackTree, () => {
      * What's worse, writing trees in JSON doesn't make it visually obvious
      * that the structure is correct. You'll just have to trust that I
      * transcribed them correctly from pencil and paper.
+     * 
+     * "But wait" you say, pointing excitedly at chapter 9 of POODR, "rotation
+     * isn't part of the RBTree's interface! You're breaking encapsulation,
+     * writing brittle tests with high cost and low value."
+     * 
+     * If we were talking about a production data structure, you would be
+     * spot on. We'd test the complete data structure for consistency,
+     * benchmark it in known pathological conditions, and call it good.
+     * However, this code is for education, which means it's provided to
+     * the student-customer incomplete. Rotation is part of what students
+     * are given, and that means we need high confidence that it works
+     * independently of any other operation.
+     * 
+     * If you're a student, you can pretty much skip this bit.
+     * If you're another instructor who has to maintain this... good luck.
      * 
      * Sincerely,
      * DPR
@@ -306,6 +321,65 @@ describe(RedBlackTree, () => {
       });
     });
 
-    
+    describe('right', () => {
+      it('correctly rotates the root right', () => {
+        const expectedStructure = {
+          key: 'b',
+          left: { key: 'a' },
+          right: {
+            key: 'd',
+            left: { key: 'c' },
+            right: mockTrees.balanced.right,
+          },
+        };
+        rbTree._root = linkTree(mockTrees.balanced);
+        rbTree._rotateRight(rbTree._root);
+
+        expect(rbTree._root.key).toBe('b');
+        checkTreeLinks(rbTree._root);
+        checkEqualStructure(rbTree._root, expectedStructure);
+      });
+
+      it('correctly rotates a non-root node right', () => {
+        const expectedStructure = {
+          ...mockTrees.balanced,
+          left: {
+            key: 'a',
+            right: {
+              key: 'b',
+              right: { key: 'c' }
+            }
+          }
+        };
+        rbTree._root = linkTree(mockTrees.balanced);
+        rbTree._rotateRight(rbTree._root.left);
+
+        checkTreeLinks(rbTree._root);
+        checkEqualStructure(rbTree._root, expectedStructure);
+      });
+
+      it('correctly rotates a node with a sentinel as right child', () => {
+        const expectedStructure = {
+          key: 'b',
+          right: { key: 'a' },
+          left: mockTrees.leftSpine.left.left,
+        };
+        rbTree._root = linkTree(mockTrees.leftSpine);
+        rbTree._rotateRight(rbTree._root);
+
+        checkTreeLinks(rbTree._root);
+        checkEqualStructure(rbTree._root, expectedStructure);
+      });
+
+      it("throws when asked to rotate a sentinel node", () => {
+        rbTree._root = linkTree(mockTrees.leftSpine);
+        expect(() => rbTree._rotateRight(rbTree._root.right)).toThrow();
+      });
+
+      it("throws when asked to rotate away from a sentinel", () => {
+        rbTree._root = linkTree(mockTrees.rightSpine);
+        expect(() => rbTree._rotateRight(rbTree._root)).toThrow();
+      });
+    });
   });
 });

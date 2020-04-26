@@ -1,6 +1,9 @@
 import RedBlackTree from './red_black_tree';
 import { RBTNode } from './red_black_tree';
 
+import seedrandom from 'seedrandom';
+import { performance } from 'perf_hooks';
+
 // This file contains tests specific to RedBlackTree
 // RedBlackTree is also covered by the generic
 // BST tests in binary_search_tree.test.js
@@ -11,7 +14,7 @@ describe(RedBlackTree, () => {
     rbTree = new RedBlackTree();
   });
 
-  describe.skip('RB properties', () => {
+  describe('RB properties', () => {
 
     const rbTreeIntrospect = (tree, callback) => {
       // Similar to the builtin forEach function. Differences:
@@ -45,43 +48,39 @@ describe(RedBlackTree, () => {
           console.log(args);
         }
       }
-      // Property numbers come from
-      // _Introduction to Algorithms_, by Cormen et. al.
 
       if (!tree._root) {
         return;
       }
 
-      // 2. The root is black
+      // The root must be black
       expect(tree._root.color).toBe(RBTNode.BLACK);
 
       const leafBlackDepths = [];
+      const doubleRedParents = [];
 
       rbTreeIntrospect(tree, (node, _, blackDepth) => {
         log(`Visiting node with key ${node.key}, color ${node.color}, blackDepth ${node.blackDepth}`);
-
-        // 1. Every node is either red or black
-        expect([RBTNode.RED, RBTNode.BLACK]).toContain(node.color);
-
-        // leaf nodes
-        if (!node.key) {
-          // 3. All leaf nodes are black (because they're the sentinel)
-          expect(node.color).toBe(RBTNode.BLACK);
-
+        // All leaf nodes must have the same depth
+        if (node === RBTNode.sentinel) {
           leafBlackDepths.push(blackDepth);
         }
 
-        // 4. If a node is red, then both of its children are black
+        // If a node is red, then both of its children must be black
         if (node.color === RBTNode.RED) {
-          expect(node.left.color).toBe(RBTNode.BLACK);
-          expect(node.right.color).toBe(RBTNode.BLACK);
+          if (node.left.color !== RBTNode.BLACK ||
+            node.right.color !== RBTNode.BLACK) {
+            doubleRedParents.push(node);
+          }
         }
       });
 
-      const errorMessage = `Expected the black-depth of all sentinel leaves to be the same, instead got ${JSON.stringify(leafBlackDepths)}`;
-      leafBlackDepths.forEach(depth => {
-        expect(depth, errorMessage).toBe(leafBlackDepths[0]);
-      });
+      expect(doubleRedParents.length).toBe(0);
+
+      const uniqueLBDs = leafBlackDepths.filter(
+        (v, i, a) => a.indexOf(v) === i);
+      expect(uniqueLBDs.length,
+        "Got different depths for sentinel leaves").toBe(1);
     }
 
     it('maintains properties on an empty tree', () => {
@@ -93,24 +92,48 @@ describe(RedBlackTree, () => {
       verifyRbTreeProperties(rbTree);
     });
 
-    it('maintains properties after many inserts in random order', () => {
+    it('maintains properties after several inserts in random order', () => {
       const keys = ['one', 'two', 'three', 'four', 'five'];
       keys.forEach(key => rbTree.insert(key));
       verifyRbTreeProperties(rbTree);
     });
 
-    it('maintains properties after many inserts in order', () => {
+    it('maintains properties after several inserts in order', () => {
       const keys = ['one', 'two', 'three', 'four', 'five'].sort();
       keys.forEach(key => rbTree.insert(key));
       verifyRbTreeProperties(rbTree);
     });
 
-    it('maintains properties after many inserts in reverse order', () => {
+    it('maintains properties after several inserts in reverse order', () => {
       const keys = ['one', 'two', 'three', 'four', 'five'].sort().reverse();
       keys.forEach(key => rbTree.insert(key));
       verifyRbTreeProperties(rbTree);
     });
 
+    const BIG_RUN_SIZE = 1000;
+
+    it('maintains properties after many inserts in random order', () => {
+      const rng = seedrandom('adadev');
+      for (let i = 0; i < BIG_RUN_SIZE; i += 1) {
+        const key = Math.floor(rng() * 2 * BIG_RUN_SIZE) + 1;
+        rbTree.insert(key, i);
+      }
+      verifyRbTreeProperties(rbTree);
+    });
+
+    it('maintains properties after many inserts in order', () => {
+      for (let i = 1; i <= BIG_RUN_SIZE; i += 1) {
+        rbTree.insert(i);
+      }
+      verifyRbTreeProperties(rbTree);
+    });
+
+    it('maintains properties after many inserts in reverse order', () => {
+      for (let i = BIG_RUN_SIZE; i > 0; i -= 1) {
+        rbTree.insert(i);
+      }
+      verifyRbTreeProperties(rbTree);
+    });
   });
 
   describe('rotations', () => {

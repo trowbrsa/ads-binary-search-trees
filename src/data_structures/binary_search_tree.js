@@ -85,17 +85,16 @@ class BinarySearchTree {
     return this._count;
   }
 
-  _visit(node, callback, i = 0) {
-    if (node?.key) {
-      i = this._visit(node.left, callback, i);
-      callback({ key: node.key, value: node.value }, i, this);
-      i = this._visit(node.right, callback, i + 1);
-    }
-    return i;
-  }
-
   forEach(callback) {
-    this._visit(this._root, callback)
+    const visit = (node, callback, i = 0) => {
+      if (node?.key) {
+        i = visit(node.left, callback, i);
+        callback({ key: node.key, value: node.value }, i, this);
+        i = visit(node.right, callback, i + 1);
+      }
+      return i;
+    }
+    visit(this._root, callback)
   }
 }
 

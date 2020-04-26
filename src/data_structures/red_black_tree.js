@@ -32,7 +32,7 @@ class RedBlackTree extends BinarySearchTree {
     if (node === RBTNode.sentinel) {
       throw new Error('Cannot rotate a sentinel node');
     } else if (child === RBTNode.sentinel) {
-      throw new Error('Cannot rotate toward a sentinal node');
+      throw new Error('Cannot rotate away from a sentinal node');
     }
 
     // turn child's left subtree into node's right subtree

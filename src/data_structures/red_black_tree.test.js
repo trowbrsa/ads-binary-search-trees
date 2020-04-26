@@ -133,6 +133,13 @@ describe(RedBlackTree, () => {
      * before giving them to the RBTree class, and then unlink them before
      * comparing them to our expected results. This test suite practically
      * needs a test suite!
+     * 
+     * What's worse, writing trees in JSON doesn't make it visually obvious
+     * that the structure is correct. You'll just have to trust that I
+     * transcribed them correctly from pencil and paper.
+     * 
+     * Sincerely,
+     * DPR
      */
     const mockTrees = Object.freeze({
       balanced: {
@@ -181,11 +188,13 @@ describe(RedBlackTree, () => {
         } else {
           node.left = RBTNode.sentinel;
         }
+
         if (node.right && node.right !== RBTNode.sentinel) {
           linkNode(node.right, node);
         } else {
           node.right = RBTNode.sentinel;
         }
+
         if (!node.parent) {
           node.parent = parent;
         }
@@ -193,6 +202,29 @@ describe(RedBlackTree, () => {
       }
       return linkNode(deepCopy(tree), RBTNode.sentinel);
     }
+
+    /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "checkTreeLinks", "checkEqualStructure"] }] */
+    const checkTreeLinks = (tree) => {
+      const visited = [];
+      const checkNodeLinks = (node, parent = RBTNode.sentinel) => {
+        visited.push(node);
+        expect(node.parent).toBe(parent);
+
+        if (node.left !== RBTNode.sentinel) {
+          expect(node.left).toBeDefined();
+          expect(visited).not.toContain(node.left);
+          checkNodeLinks(node.left, node)
+        }
+
+        if (node.right !== RBTNode.sentinel) {
+          expect(node.right).toBeDefined();
+          expect(visited).not.toContain(node.right);
+          checkNodeLinks(node.right, node)
+        }
+      }
+      checkNodeLinks(tree);
+    }
+
 
     const checkEqualStructure = (oak, pine) => {
       const unlinkNode = (node) => {
@@ -213,20 +245,67 @@ describe(RedBlackTree, () => {
       expect(oak).toStrictEqual(pine);
     }
 
-    it('correctly rotates the root left', () => {
-      const expectedStructure = {
-        key: 'f',
-        left: {
-          key: 'd',
-          left: mockTrees.balanced.left,
-          right: { key: 'e' },
-        },
-        right: { key: 'g' },
-      };
-      rbTree._root = linkTree(mockTrees.balanced);
-      rbTree._rotateLeft(rbTree._root);
-      expect(rbTree._root.key).toBe('f');
-      checkEqualStructure(rbTree._root, expectedStructure);
+    describe('left', () => {
+      it('correctly rotates the root left', () => {
+        const expectedStructure = {
+          key: 'f',
+          left: {
+            key: 'd',
+            left: mockTrees.balanced.left,
+            right: { key: 'e' },
+          },
+          right: { key: 'g' },
+        };
+        rbTree._root = linkTree(mockTrees.balanced);
+        rbTree._rotateLeft(rbTree._root);
+
+        expect(rbTree._root.key).toBe('f');
+        checkTreeLinks(rbTree._root);
+        checkEqualStructure(rbTree._root, expectedStructure);
+      });
+
+      it('correctly rotates a non-root node left', () => {
+        const expectedStructure = {
+          ...mockTrees.balanced,
+          left: {
+            key: 'c',
+            left: {
+              key: 'b',
+              left: { key: 'a' }
+            }
+          }
+        };
+        rbTree._root = linkTree(mockTrees.balanced);
+        rbTree._rotateLeft(rbTree._root.left);
+
+        checkTreeLinks(rbTree._root);
+        checkEqualStructure(rbTree._root, expectedStructure);
+      });
+
+      it('correctly rotates a node with a sentinel as left child', () => {
+        const expectedStructure = {
+          key: 'b',
+          left: { key: 'a' },
+          right: mockTrees.rightSpine.right.right,
+        };
+        rbTree._root = linkTree(mockTrees.rightSpine);
+        rbTree._rotateLeft(rbTree._root);
+
+        checkTreeLinks(rbTree._root);
+        checkEqualStructure(rbTree._root, expectedStructure);
+      });
+
+      it("throws when asked to rotate a sentinel node", () => {
+        rbTree._root = linkTree(mockTrees.rightSpine);
+        expect(() => rbTree._rotateLeft(rbTree._root.left)).toThrow();
+      });
+
+      it("throws when asked to rotate away from a sentinel", () => {
+        rbTree._root = linkTree(mockTrees.leftSpine);
+        expect(() => rbTree._rotateLeft(rbTree._root)).toThrow();
+      });
     });
+
+    
   });
 });

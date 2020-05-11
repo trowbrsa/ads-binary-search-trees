@@ -98,6 +98,9 @@ class RedBlackTree {
     node.parent = child;
   }
 
+  _insertInternal(key, value) {
+  }
+
   _insertFixup(node) {
   }
 

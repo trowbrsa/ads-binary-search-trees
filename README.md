@@ -1,10 +1,10 @@
-# Binary Search Trees Lab
+# Binary Search Trees / Red-Black Trees Lab
 
 Ada Developers Academy / Lovelace Learning Labs
 
 Advanced Data Structures 1 - Trees
 
-Week 2
+Weeks 2 and 3
 
 ## Instructions
 
@@ -27,7 +27,7 @@ Run tests in watch mode
 $ npm test
 ```
 
-## Assignment
+## Assignment - Week 2
 
 ### Core
 

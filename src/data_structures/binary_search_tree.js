@@ -34,7 +34,7 @@ class BinarySearchTree {
   }
 
   delete(key) {
-    // TODO (optional, make sure to write tests)
+    // TODO (tests first!)
   }
 
   count() {

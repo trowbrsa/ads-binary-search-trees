@@ -106,6 +106,69 @@ dataStructures.forEach(TargetDS => {
       });
     });
 
+    describe('delete', () => {
+      it('returns the value for the removed record', () => {
+
+      });
+
+      it('returns undefined if the record was not found', () => {
+
+      });
+
+      it('reduces the count by 1', () => {
+
+      });
+
+      it('omits the removed record from iteration results', () => {
+
+      });
+
+      it('can remove every element in a tree', () => {
+
+      });
+
+      describe('scenarios', () => {
+        // The first step for each of these tests will be to construct
+        // a tree matching the scenario. How can you use your knowledge
+        // of how insert works to do this? How can you check your work?
+
+        it('can remove the record with the smallest key', () => {
+          // TODO:
+          // Insert several records
+          // Remove the record with the smallest key
+          // Ensure that looking up that key returns undefined
+        });
+
+        it('can remove the record with the largest key', () => {
+
+        });
+
+        it('can remove the root', () => {
+
+        });
+
+        it('can remove a node with no children', () => {
+
+        });
+
+        it('can remove a node with only a left child', () => {
+
+        });
+
+        it('can remove a node with only a right child', () => {
+
+        });
+
+        it('can remove a node with both children, where the successor is the node\'s right child', () => {
+
+        });
+
+        it('can remove a node with both children, where the successor is not the node\'s right child', () => {
+
+        });
+      });
+    });
+
     describe('forEach', () => {
       let records;
       beforeEach(() => {

@@ -17,11 +17,11 @@ dataStructures.forEach(TargetDS => {
     });
 
     describe('lookup', () => {
-      // it('returns undefined on an empty tree', () => {
-      //   expect(bst.lookup('test')).toBe(undefined);
-      // });
+      it('returns undefined on an empty tree', () => {
+        expect(bst.lookup('test')).toBe(undefined);
+      });
 
-      it.only('returns undefined if the key is not in the tree', () => {
+      it('returns undefined if the key is not in the tree', () => {
         // const keys = ['many', 'keys', 'for', 'this', 'tree'];
         const keys = ['many', 'keys', 'for'];
         keys.forEach((key, i) => {
@@ -31,12 +31,12 @@ dataStructures.forEach(TargetDS => {
         expect(bst.lookup('dne')).toBe(undefined);
       });
 
-      it.only('finds the only record', () => {
+      it('finds the only record', () => {
         bst.insert('test');
         expect(bst.lookup('test')).toBeTruthy();
       });
 
-      it.only('finds any extant record', () => {
+      it('finds any extant record', () => {
         const keys = ['many', 'keys', 'for', 'this', 'tree'];
         keys.forEach(key => {
           bst.insert(key);
@@ -51,7 +51,7 @@ dataStructures.forEach(TargetDS => {
         });
       });
 
-      it.only('returns the value associated with a record', () => {
+      it('returns the value associated with a record', () => {
         const records = [
           { key: 'one', value: 'first' },
           { key: 'two', value: 'second' },
@@ -75,7 +75,7 @@ dataStructures.forEach(TargetDS => {
     });
 
     describe('insert', () => {
-      it.only('increases count by 1', () => {
+      it('increases count by 1', () => {
         expect(bst.count()).toBe(0);
         bst.insert('test');
         expect(bst.count()).toBe(1);
@@ -87,7 +87,7 @@ dataStructures.forEach(TargetDS => {
         });
       });
 
-      it.only('replaces records with the same key and does not increase the count', () => {
+      it('replaces records with the same key and does not increase the count', () => {
         bst.insert('test', 'first value');
         expect(bst.count()).toBe(1);
         expect(bst.lookup('test')).toBe('first value');
@@ -97,15 +97,16 @@ dataStructures.forEach(TargetDS => {
         expect(bst.lookup('test')).toBe('second value');
       });
 
-      it.only('uses true as the default value', () => {
+      it('uses true as the default value', () => {
         bst.insert('test');
         expect(bst.lookup('test')).toBe(true);
       });
     });
 
-    describe('delete', () => {
+    describe.skip('delete', () => {
       it('returns the value for the removed record', () => {
         bst.insert('test-key', 'test-value');
+        bst.delete('test-key')
 
         expect(bst.delete('test-key')).toBe('test-value');
 

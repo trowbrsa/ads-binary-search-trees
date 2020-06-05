@@ -16,14 +16,30 @@ class BinarySearchTree {
   }
 
   _findNode(key) {
+    let current = this._root;
+    let parent = undefined;
 
+    if (!current) return { node: undefined, parent: undefined };
+
+    while (current) {
+      if (key < current.key) {
+        parent = current;
+        current = current.left;
+      } else if (key > current.key) {
+        parent = current;
+        current = current.right;
+      } else { // we have a match
+        break;
+      }
+    }
+    return { node: current, parent }
   }
 
   insert(key, value = true) {
     let current = this._root;
     let parent = undefined;
 
-    if (!this._root) {
+    if (!this._root) { // TODO: refactor to use _findNode instead
       const node = new BSTNode({ key, value })
       this._root = node;
       this._count += 1;
@@ -68,7 +84,6 @@ class BinarySearchTree {
   }
 
   delete(key) {
-    // TODO (tests first!)
   }
 
   count() {
